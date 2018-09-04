@@ -25,8 +25,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="132dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="173dp"
         android:text="Categories"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -54,5 +54,15 @@
         android:text="Stop Service"
         tools:layout_editor_absoluteX="132dp"
         tools:layout_editor_absoluteY="389dp" />
+
+    <Button
+        android:id="@+id/send_test_record_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="93dp"
+        android:text="Send test record" />
 
 </RelativeLayout>
