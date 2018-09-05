@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WalletAssistant</string>
+    <string name="notification_channel_name">WalletAssistantNotifications</string>
+    <string name="notification_channel_description">Notify about new record for sending</string>
 </resources>

@@ -2,6 +2,8 @@ package com.kindhomeless.wa.walletassistant;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -28,7 +30,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.kindhomeless.wa.walletassistant.util.Constants.APP_TAG;
+import static com.kindhomeless.wa.walletassistant.util.Constants.CHANNEL_ID;
 import static com.kindhomeless.wa.walletassistant.util.Constants.REQUEST_CODE_ASK_PERMISSIONS;
+import static com.kindhomeless.wa.walletassistant.util.Constants.SMS_TEXT_EXTRA;
 import static java.util.Collections.singletonList;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,12 +44,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        categoriesTextView = findViewById(R.id.categories);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestSMSPermission(this);
         }
-
+        createNotificationChannel();
         walletApi = buildWalletApiClient();
 
         findViewById(R.id.get_categories_button).setOnClickListener(v ->
@@ -56,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 startService(new Intent(getApplicationContext(), SmsListenerService.class)));
         findViewById(R.id.stop_service_button).setOnClickListener(v ->
                 stopService(new Intent(getApplicationContext(), SmsListenerService.class)));
+
+        categoriesTextView = findViewById(R.id.categories);
+        applyIntentExtras(categoriesTextView);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -81,6 +86,42 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(WalletApi.class);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.notification_channel_name);
+            String description = getString(R.string.notification_channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            } else {
+                Log.d(APP_TAG, "notificationManager returned as null in MainActivity " +
+                        "when creating a channel");
+            }
+        }
+    }
+
+    private void applyIntentExtras(TextView smsMessageTextView) {
+        Intent intent = getIntent();
+        if (intent == null) {
+            Log.d(APP_TAG, "Intent is null in MainActivity");
+            return;
+        }
+
+        Bundle extras = intent.getExtras();
+
+        if (extras == null) {
+            Log.d(APP_TAG, "Extras are null in MainActivity");
+            return;
+        }
+
+        smsMessageTextView.setText(extras.getString(SMS_TEXT_EXTRA));
     }
 
     private class CategoriesListCallback implements Callback<List<Category>> {
