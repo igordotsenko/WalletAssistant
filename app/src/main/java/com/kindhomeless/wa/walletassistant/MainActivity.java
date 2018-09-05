@@ -16,10 +16,10 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kindhomeless.wa.walletassistant.api.WalletApi;
 import com.kindhomeless.wa.walletassistant.components.SmsListenerService;
 import com.kindhomeless.wa.walletassistant.model.Category;
 import com.kindhomeless.wa.walletassistant.model.Record;
+import com.kindhomeless.wa.walletassistant.repo.WalletApi;
 
 import java.util.List;
 
@@ -32,7 +32,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static com.kindhomeless.wa.walletassistant.util.Constants.APP_TAG;
 import static com.kindhomeless.wa.walletassistant.util.Constants.CHANNEL_ID;
 import static com.kindhomeless.wa.walletassistant.util.Constants.REQUEST_CODE_ASK_PERMISSIONS;
-import static com.kindhomeless.wa.walletassistant.util.Constants.SMS_TEXT_EXTRA;
 import static java.util.Collections.singletonList;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,9 +43,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestSMSPermission(this);
-        }
+        requestSMSPermission(this);
         createNotificationChannel();
         walletApi = buildWalletApiClient();
 
@@ -60,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
                 stopService(new Intent(getApplicationContext(), SmsListenerService.class)));
 
         categoriesTextView = findViewById(R.id.categories);
-        applyIntentExtras(categoriesTextView);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -105,23 +101,6 @@ public class MainActivity extends AppCompatActivity {
                         "when creating a channel");
             }
         }
-    }
-
-    private void applyIntentExtras(TextView smsMessageTextView) {
-        Intent intent = getIntent();
-        if (intent == null) {
-            Log.d(APP_TAG, "Intent is null in MainActivity");
-            return;
-        }
-
-        Bundle extras = intent.getExtras();
-
-        if (extras == null) {
-            Log.d(APP_TAG, "Extras are null in MainActivity");
-            return;
-        }
-
-        smsMessageTextView.setText(extras.getString(SMS_TEXT_EXTRA));
     }
 
     private class CategoriesListCallback implements Callback<List<Category>> {

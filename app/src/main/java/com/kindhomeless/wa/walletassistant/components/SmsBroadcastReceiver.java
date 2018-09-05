@@ -14,12 +14,15 @@ import android.util.Log;
 import com.kindhomeless.wa.walletassistant.MainActivity;
 import com.kindhomeless.wa.walletassistant.R;
 
+import java.util.Random;
+
 import static com.kindhomeless.wa.walletassistant.util.Constants.APP_TAG;
 import static com.kindhomeless.wa.walletassistant.util.Constants.CHANNEL_ID;
-import static com.kindhomeless.wa.walletassistant.util.Constants.NOTIFICATION_ID;
 import static com.kindhomeless.wa.walletassistant.util.Constants.SMS_TEXT_EXTRA;
 
 public class SmsBroadcastReceiver extends BroadcastReceiver {
+    private final Random random = new Random();;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(APP_TAG, "In SmsBroadcastReceiver onReceive");
@@ -40,7 +43,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 SmsMessage currentMessage = SmsMessage.createFromPdu((byte[]) pdu);
                 String senderNum = currentMessage.getDisplayOriginatingAddress();
                 // TODO deharcode
-                if (!"+380931842098".equals(senderNum)) {
+                if (!"+380931842098".equals(senderNum) && !"10901".equals(senderNum)) {
                     Log.i(APP_TAG, "Received sms from " + senderNum + " and it's not expected number");
                     return;
                 }
@@ -61,11 +64,10 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_launcher_background)
                 .setContentTitle("Wallet Assistance Test")
                 .setContentText(smsText)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(smsText))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(smsText))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        Intent resultIntent = new Intent(context, MainActivity.class);
+        Intent resultIntent = new Intent(context, RecordPostActivity.class);
         resultIntent.putExtra(SMS_TEXT_EXTRA, smsText);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
@@ -73,16 +75,20 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
         stackBuilder.addNextIntent(resultIntent);
 
         PendingIntent resultPendingIntent
-                = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                = PendingIntent.getActivity(context, random.nextInt(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         notificationBuilder.setContentIntent(resultPendingIntent);
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (notificationManager != null) {
-            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
+            notificationManager.notify(getRandomNotificationId(), notificationBuilder.build());
         } else {
             Log.d(APP_TAG, "Got notificationManager as null in SmsBroadcastReceiver");
         }
+    }
+
+    private int getRandomNotificationId() {
+        return random.nextInt(9999 - 1000) + 1000;
     }
 }
 

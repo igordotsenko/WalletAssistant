@@ -1,4 +1,4 @@
-package com.kindhomeless.wa.walletassistant.api;
+package com.kindhomeless.wa.walletassistant.repo;
 
 import com.kindhomeless.wa.walletassistant.model.Category;
 import com.kindhomeless.wa.walletassistant.model.Record;
