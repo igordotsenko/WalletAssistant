@@ -28,4 +28,8 @@ public class Record {
     public Record() {
         this(DEFAULT_CATEGORY_ID, DEFAULT_ACCOUNT_ID, DEFAULT_CURRENCY, DEFAULT_AMOUNT, DEFAULT_PAYMENT_TYPE);
     }
+
+    public Record(String categoryId, double amount) {
+        this(categoryId, DEFAULT_ACCOUNT_ID, DEFAULT_CURRENCY, amount, DEFAULT_PAYMENT_TYPE);
+    }
 }

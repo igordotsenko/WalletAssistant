@@ -4,7 +4,7 @@
     package="com.kindhomeless.wa.walletassistant">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
 
     <application
@@ -31,7 +31,9 @@
         <receiver
             android:name=".components.SmsBroadcastReceiver"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
+
+        <activity android:name=".components.RecordPostActivity"></activity>
     </application>
 
 </manifest>

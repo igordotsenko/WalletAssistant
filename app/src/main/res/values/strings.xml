@@ -1,5 +1,20 @@
 <resources>
-    <string name="app_name">WalletAssistant</string>
+    <string name="app_name">Wallet Assistant</string>
     <string name="notification_channel_name">WalletAssistantNotifications</string>
     <string name="notification_channel_description">Notify about new record for sending</string>
+
+    <!-- Main Activity Strings -->
+    <string name="start_service_button">Start Service</string>
+    <string name="get_categories_button">Get Cat-s</string>
+    <string name="categories_text_view">Categories</string>
+    <string name="stop_service_button">Stop Service</string>
+    <string name="send_test_record_button">Send test record</string>
+
+    <!-- Record Post Activity -->
+    <string name="payment_amount_header">Payment Amount:</string>
+    <string name="payment_amount_placeholder">No amount specified</string>
+    <string name="sms_text_header">SMS text:</string>
+    <string name="sms_text_placeholder">No valid SMS text found</string>
+    <string name="post_record_button">Post Record</string>
+
 </resources>
