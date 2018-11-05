@@ -7,17 +7,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.kindhomeless.wa.walletassistant.R;
+import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformer;
+import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformerImpl;
+import com.kindhomeless.wa.walletassistant.logic.transformer.TransformationException;
 import com.kindhomeless.wa.walletassistant.model.Category;
 import com.kindhomeless.wa.walletassistant.model.PaymentSms;
 import com.kindhomeless.wa.walletassistant.model.Record;
-import com.kindhomeless.wa.walletassistant.repo.WalletApi;
-import com.kindhomeless.wa.walletassistant.util.transformer.TextToPaymentSmsTransformer;
-import com.kindhomeless.wa.walletassistant.util.transformer.TextToPaymentSmsTransformerImpl;
-import com.kindhomeless.wa.walletassistant.util.transformer.TransformationException;
+import com.kindhomeless.wa.walletassistant.repo.api.WalletApiManager;
+import com.kindhomeless.wa.walletassistant.repo.api.WalletApiManagerImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +31,10 @@ import java.util.stream.Collectors;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.text.TextUtils.isEmpty;
 import static com.kindhomeless.wa.walletassistant.util.Constants.APP_TAG;
 import static com.kindhomeless.wa.walletassistant.util.Constants.SMS_TEXT_EXTRA;
-import static com.kindhomeless.wa.walletassistant.util.Constants.WALLET_API_BASE_URL;
 import static com.kindhomeless.wa.walletassistant.util.ToastUtils.showToast;
 import static com.kindhomeless.wa.walletassistant.util.ToastUtils.showToastAndLogDebug;
 import static com.kindhomeless.wa.walletassistant.util.ToastUtils.showToastAndLogError;
@@ -46,32 +45,49 @@ import static java.util.Collections.singletonList;
  */
 public class RecordPostActivity extends AppCompatActivity {
     private TextView paymentAmountTextView;
-    private WalletApi walletApi;
+    private Spinner categoriesDropdown;
+    private TextView smsMessageTextView;
+    private Button postRecordButton;
+
+    private WalletApiManager walletApiManager;
     private TextToPaymentSmsTransformer textToPaymentSmsTransformer;
     private Map<String, Category> categoryNameToCategory;
-    private Spinner categoriesDropdown;
-    private PaymentSms paymentSms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record_post);
-        paymentAmountTextView = findViewById(R.id.payment_amount_text_view);
+        initializeUiElements();
 
         textToPaymentSmsTransformer = new TextToPaymentSmsTransformerImpl();
+
         Optional<String> smsText = getSmsTextFromIntent();
-        if (smsText.isPresent()) {
-            setPaymentAmount(smsText.get());
-            ((TextView) findViewById(R.id.sms_message_text_view)).setText(smsText.get());
-        } else {
+        if (!smsText.isPresent()) {
             showToast(this, "No sms text extracted");
             return;
         }
 
+        Optional<PaymentSms> paymentSms = buildPaymentSms(smsText.get());
+        if (!paymentSms.isPresent()) {
+            return;
+        }
+
+        handlePaymentSms(paymentSms.get());
+        walletApiManager = new WalletApiManagerImpl(this);
+        walletApiManager.listAllCategories(new CategoriesListCallback());
+    }
+
+    private void initializeUiElements() {
+        paymentAmountTextView = findViewById(R.id.payment_amount_text_view);
         categoriesDropdown = findViewById(R.id.categories_list_dropdown);
-        findViewById(R.id.post_record_button).setOnClickListener(new PostRecordButtonListener());
-        walletApi = buildWalletApiClient();
-        walletApi.listAllCategories().enqueue(new CategoriesListCallback());
+        smsMessageTextView = findViewById(R.id.sms_message_text_view);
+        postRecordButton = findViewById(R.id.post_record_button);
+    }
+
+    private void handlePaymentSms(PaymentSms paymentSms) {
+        paymentAmountTextView.setText(String.format("%s", paymentSms.getAmount()));
+        smsMessageTextView.setText(paymentSms.getText());
+        postRecordButton.setOnClickListener(new PostRecordButtonListener(paymentSms));
     }
 
     private Optional<String> getSmsTextFromIntent() {
@@ -90,18 +106,24 @@ public class RecordPostActivity extends AppCompatActivity {
         return Optional.ofNullable(extras.getString(SMS_TEXT_EXTRA));
     }
 
-    private void setPaymentAmount(String smsText) {
+    private Optional<PaymentSms> buildPaymentSms(String smsText) {
         try {
-            paymentSms = textToPaymentSmsTransformer.transform(smsText);
-            paymentAmountTextView.setText(String.format("%s", paymentSms.getAmount()));
+            return Optional.of(textToPaymentSmsTransformer.transform(smsText));
         } catch (TransformationException e) {
-            String errorMsg = "Cannot set amount: " + e.getMessage();
+            String errorMsg = "Cannot transform payment sms: " + e.getMessage();
             showToast(this, errorMsg);
             Log.e(APP_TAG, errorMsg, e);
+            return Optional.empty();
         }
     }
 
     private class PostRecordButtonListener implements View.OnClickListener {
+        private final PaymentSms paymentSms;
+
+        public PostRecordButtonListener(PaymentSms paymentSms) {
+            this.paymentSms = paymentSms;
+        }
+
         @Override
         public void onClick(View v) {
             if (paymentSms == null) {
@@ -117,7 +139,7 @@ public class RecordPostActivity extends AppCompatActivity {
                 return;
             }
             Record record = new Record(categoryId, paymentSms.getAmount());
-            walletApi.postRecord(singletonList(record)).enqueue(new PostRecordCallback());
+            walletApiManager.postRecord(singletonList(record), new PostRecordCallback());
         }
     }
 
@@ -180,13 +202,5 @@ public class RecordPostActivity extends AppCompatActivity {
         public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
             showToastAndLogError(RecordPostActivity.this, "Error on record post" , t);
         }
-    }
-
-    private WalletApi buildWalletApiClient() {
-        return new Retrofit.Builder()
-                .baseUrl(WALLET_API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(WalletApi.class);
     }
 }

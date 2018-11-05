@@ -1,4 +1,4 @@
-package com.kindhomeless.wa.walletassistant.util.transformer;
+package com.kindhomeless.wa.walletassistant.logic.transformer;
 
 import android.support.annotation.NonNull;
 
@@ -19,10 +19,10 @@ public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransfor
     @Override
     public PaymentSms transform(@NonNull String paymentSmsText) throws TransformationException {
         if (!paymentSmsText.startsWith(UAH_PAYMENT_PREFIX)) {
-            throw new TransformationException("Is not a UAH payment");
+            throw new TransformationException("Is not an UAH payment");
         }
         String[] parts = getParts(paymentSmsText);
-        return new PaymentSms(getAmount(parts));
+        return new PaymentSms(paymentSmsText, getAmount(parts));
     }
 
     private String[] getParts(String paymentSmsTest) throws TransformationException {

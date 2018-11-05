@@ -1,4 +1,4 @@
-package com.kindhomeless.wa.walletassistant.util.transformer;
+package com.kindhomeless.wa.walletassistant.logic.transformer;
 
 import android.support.annotation.NonNull;
 

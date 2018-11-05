@@ -9,6 +9,9 @@
     <string name="categories_text_view">Categories</string>
     <string name="stop_service_button">Stop Service</string>
     <string name="send_test_record_button">Send test record</string>
+    <string name="e_mail_hint">E-mail</string>
+    <string name="token_hint">Token</string>
+    <string name="apply_credentials_button">Apply Cred-s</string>
 
     <!-- Record Post Activity -->
     <string name="payment_amount_header">Payment Amount:</string>

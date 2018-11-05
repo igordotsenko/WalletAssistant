@@ -1,5 +1,9 @@
 package com.kindhomeless.wa.walletassistant.util.transformer;
 
+import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformer;
+import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformerImpl;
+import com.kindhomeless.wa.walletassistant.logic.transformer.TransformationException;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
