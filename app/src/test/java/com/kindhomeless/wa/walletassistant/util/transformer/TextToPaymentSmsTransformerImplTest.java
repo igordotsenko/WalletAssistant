@@ -1,5 +1,6 @@
 package com.kindhomeless.wa.walletassistant.util.transformer;
 
+import com.kindhomeless.wa.walletassistant.BasicTest;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformer;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformerImpl;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TransformationException;
@@ -15,7 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class TextToPaymentSmsTransformerImplTest {
+public class TextToPaymentSmsTransformerImplTest extends BasicTest {
 
     private final PaymentPlaceRepo paymentPlaceRepoTestRepo
             = RepositoryManager.getInstance().getRepositoryForTest(PaymentPlaceRepo.class);

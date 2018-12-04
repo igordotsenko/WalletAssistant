@@ -1,7 +1,10 @@
 package com.kindhomeless.wa.walletassistant.repo.storage;
 
-@SuppressWarnings("unused")
-public interface CategoryRepo {
+import com.kindhomeless.wa.walletassistant.model.Category;
 
-    String findCategoryNameByPaymentPlace(String paymentPlaceName);
+public interface CategoryRepo extends GeneralRepo<Category> {
+
+    Category findCategoryByName(String categoryName);
+
+    Category finaByWalletId(String walletId);
 }

@@ -51,6 +51,7 @@ public class RepositoryManager {
     private void initializeRepositoryByClassMap() {
         // TODO update to real repo when it's implemented
         repositoryByClass.put(PaymentPlaceRepo.class, new PaymentPlaceRepoMock());
+        repositoryByClass.put(CategoryRepo.class, new CategoryRepoImpl());
     }
 
 

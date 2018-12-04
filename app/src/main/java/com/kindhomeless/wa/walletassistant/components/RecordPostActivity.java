@@ -148,7 +148,7 @@ public class RecordPostActivity extends AppCompatActivity {
             }
 
             String selectedCategoryName = categoriesDropdown.getSelectedItem().toString();
-            String categoryId = categoryNameToCategory.get(selectedCategoryName).getId();
+            String categoryId = categoryNameToCategory.get(selectedCategoryName).getWalletId();
             if (isEmpty(categoryId)) {
                 showToast(RecordPostActivity.this, "Category is not chosen or not known");
                 return;
