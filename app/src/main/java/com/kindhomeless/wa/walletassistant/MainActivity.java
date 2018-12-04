@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         public void onClick(View v) {
             try {
                 CredentialsManager.getInstance().saveCredentials(MainActivity.this, buildCredentials());
+                ToastUtils.showToastAndLogDebug(MainActivity.this, "Credentials updated");
             } catch (EmptyCredentialsException e) {
                 ToastUtils.showToastAndLogError(MainActivity.this, "Error on credential saving", e);
             }

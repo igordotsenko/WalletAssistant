@@ -9,6 +9,13 @@ public class Category {
     private String defaultType;
     private int position;
 
+    public Category() {
+    }
+
+    public Category(String name) {
+        this.name = name;
+    }
+
     public String getId() {
         return id;
     }

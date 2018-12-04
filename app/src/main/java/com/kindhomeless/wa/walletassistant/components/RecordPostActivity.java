@@ -16,10 +16,13 @@ import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTra
 import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformerImpl;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TransformationException;
 import com.kindhomeless.wa.walletassistant.model.Category;
+import com.kindhomeless.wa.walletassistant.model.PaymentPlace;
 import com.kindhomeless.wa.walletassistant.model.PaymentSms;
 import com.kindhomeless.wa.walletassistant.model.Record;
 import com.kindhomeless.wa.walletassistant.repo.api.WalletApiManager;
 import com.kindhomeless.wa.walletassistant.repo.api.WalletApiManagerImpl;
+import com.kindhomeless.wa.walletassistant.repo.storage.PaymentPlaceRepo;
+import com.kindhomeless.wa.walletassistant.repo.storage.RepositoryManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +48,8 @@ import static java.util.Collections.singletonList;
  */
 public class RecordPostActivity extends AppCompatActivity {
     private TextView paymentAmountTextView;
+    private TextView paymentPlaceTextView;
+    private TextView suggestedCategoryTextView;
     private Spinner categoriesDropdown;
     private TextView smsMessageTextView;
     private Button postRecordButton;
@@ -59,7 +64,9 @@ public class RecordPostActivity extends AppCompatActivity {
         setContentView(R.layout.activity_record_post);
         initializeUiElements();
 
-        textToPaymentSmsTransformer = new TextToPaymentSmsTransformerImpl();
+        PaymentPlaceRepo paymentPlaceRepo
+                = RepositoryManager.getInstance().getRepository(PaymentPlaceRepo.class);
+        textToPaymentSmsTransformer = new TextToPaymentSmsTransformerImpl(paymentPlaceRepo);
 
         Optional<String> smsText = getSmsTextFromIntent();
         if (!smsText.isPresent()) {
@@ -74,11 +81,13 @@ public class RecordPostActivity extends AppCompatActivity {
 
         handlePaymentSms(paymentSms.get());
         walletApiManager = new WalletApiManagerImpl(this);
-        walletApiManager.listAllCategories(new CategoriesListCallback());
+        walletApiManager.listAllCategories(new CategoriesListCallback(paymentSms.get()));
     }
 
     private void initializeUiElements() {
         paymentAmountTextView = findViewById(R.id.payment_amount_text_view);
+        paymentPlaceTextView = findViewById(R.id.payment_place_text_view);
+        suggestedCategoryTextView = findViewById(R.id.suggested_category_text_view);
         categoriesDropdown = findViewById(R.id.categories_list_dropdown);
         smsMessageTextView = findViewById(R.id.sms_message_text_view);
         postRecordButton = findViewById(R.id.post_record_button);
@@ -88,6 +97,12 @@ public class RecordPostActivity extends AppCompatActivity {
         paymentAmountTextView.setText(String.format("%s", paymentSms.getAmount()));
         smsMessageTextView.setText(paymentSms.getText());
         postRecordButton.setOnClickListener(new PostRecordButtonListener(paymentSms));
+        paymentSms.getPaymentPlace().ifPresent(this::handlePaymentPlace);
+    }
+
+    private void handlePaymentPlace(PaymentPlace paymentPlace) {
+        paymentPlaceTextView.setText(paymentPlace.getName());
+        suggestedCategoryTextView.setText(paymentPlace.getAssociatedCategory().getName());
     }
 
     private Optional<String> getSmsTextFromIntent() {
@@ -145,6 +160,11 @@ public class RecordPostActivity extends AppCompatActivity {
 
     private class CategoriesListCallback implements Callback<List<Category>> {
         private static final String CANNOT_RETRIEVE_MESSAGE = "Cannot retrieve categories";
+        private PaymentSms paymentSms;
+
+        public CategoriesListCallback(PaymentSms paymentSms) {
+            this.paymentSms = paymentSms;
+        }
 
         @Override
         public void onResponse(@NonNull Call<List<Category>> call,
@@ -160,6 +180,7 @@ public class RecordPostActivity extends AppCompatActivity {
 
                 categoryNameToCategory = buildCategoryNameToCategoryMap(categories);
                 categoriesDropdown.setAdapter(buildDropdownAdapter());
+                paymentSms.getPaymentPlace().ifPresent(this::selectSuggestedCategoryOnDropdown);
             } else {
                 String message = "Response is unsuccessful: " + response.message();
                 Log.d(APP_TAG, message);
@@ -186,6 +207,13 @@ public class RecordPostActivity extends AppCompatActivity {
             return new ArrayAdapter<>(RecordPostActivity.this,
                     android.R.layout.simple_spinner_dropdown_item,
                     new ArrayList<>(categoryNameToCategory.keySet()));
+        }
+
+        @SuppressWarnings("unchecked")
+        private void selectSuggestedCategoryOnDropdown(PaymentPlace paymentPlace) {
+            int position = ((ArrayAdapter) categoriesDropdown.getAdapter())
+                    .getPosition(paymentPlace.getAssociatedCategory().getName());
+            categoriesDropdown.setSelection(position);
         }
     }
 

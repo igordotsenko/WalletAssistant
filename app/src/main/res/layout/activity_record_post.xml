@@ -32,20 +32,55 @@
         android:text="@string/payment_amount_placeholder" />
 
     <TextView
-        android:id="@+id/sms_message_text_view"
+        android:id="@+id/payment_place_header_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/payment_amount_header_text_view"
+        android:text="@string/payment_place_header" />
+
+    <TextView
+        android:id="@+id/payment_place_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/payment_amount_text_view"
-        android:layout_alignTop="@+id/sms_message_header_text_view"
-        android:text="@string/sms_text_header" />
+        android:layout_alignTop="@+id/payment_place_header_text_view"
+        android:text="@string/payment_place_default_name" />
+
+    <TextView
+        android:id="@+id/suggested_category_header_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/payment_place_header_text_view"
+        android:text="@string/suggested_category_header" />
+
+    <TextView
+        android:id="@+id/suggested_category_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/payment_place_text_view"
+        android:layout_alignTop="@+id/suggested_category_header_text_view"
+        android:text="@string/payment_place_default_name" />
+
 
     <TextView
         android:id="@+id/sms_message_header_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="82dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/suggested_category_header_text_view"
+        android:text="@string/sms_text_header" />
+
+    <TextView
+        android:id="@+id/sms_message_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/payment_amount_text_view"
+        android:layout_alignTop="@+id/sms_message_header_text_view"
         android:text="@string/sms_text_header" />
 
     <Button

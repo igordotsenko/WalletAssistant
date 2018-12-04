@@ -19,5 +19,9 @@
     <string name="sms_text_header">SMS text:</string>
     <string name="sms_text_placeholder">No valid SMS text found</string>
     <string name="post_record_button">Post Record</string>
+    <string name="payment_place_header">Payment place:</string>
+    <string name="payment_place_default_name">unknown</string>
+    <string name="suggested_category_header">Suggested category:</string>
+    <string name="suggested_category_default_name">unknown</string>
 
 </resources>

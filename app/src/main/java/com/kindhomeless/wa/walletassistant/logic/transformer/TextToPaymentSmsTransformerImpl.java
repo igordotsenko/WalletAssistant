@@ -2,7 +2,9 @@ package com.kindhomeless.wa.walletassistant.logic.transformer;
 
 import android.support.annotation.NonNull;
 
+import com.kindhomeless.wa.walletassistant.model.PaymentPlace;
 import com.kindhomeless.wa.walletassistant.model.PaymentSms;
+import com.kindhomeless.wa.walletassistant.repo.storage.PaymentPlaceRepo;
 
 /**
  * Transform raw payment sms text to the metadata parts
@@ -13,8 +15,16 @@ public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransfor
     private static final String PARTS_SEPARATOR = "UAH";
     private static final String WORDS_SEPARATOR = " ";
     private static final String UAH_PAYMENT_PREFIX = "Vasha operatsija:";
+    private static final String PAYMENT_PLACE_POSTFIX = "dostupna suma";
     private static final int MIN_EXPECTED_PARTS = 2;
     private static final int PAYMENT_AMOUNT_PART_NUMBER = 0;
+    private static final int PAYMENT_PLACE_PART_NUMBER = 1;
+
+    private PaymentPlaceRepo paymentPlaceRepo;
+
+    public TextToPaymentSmsTransformerImpl(PaymentPlaceRepo paymentPlaceRepo) {
+        this.paymentPlaceRepo = paymentPlaceRepo;
+    }
 
     @Override
     public PaymentSms transform(@NonNull String paymentSmsText) throws TransformationException {
@@ -22,7 +32,7 @@ public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransfor
             throw new TransformationException("Is not an UAH payment");
         }
         String[] parts = getParts(paymentSmsText);
-        return new PaymentSms(paymentSmsText, getAmount(parts));
+        return new PaymentSms(paymentSmsText, getAmount(parts), getPaymentPlace(parts));
     }
 
     private String[] getParts(String paymentSmsTest) throws TransformationException {
@@ -55,5 +65,10 @@ public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransfor
         } catch (NumberFormatException e) {
             throw new TransformationException(e);
         }
+    }
+
+    private PaymentPlace getPaymentPlace(String[] parts) {
+        String paymentPlaceName = parts[PAYMENT_PLACE_PART_NUMBER].split(PAYMENT_PLACE_POSTFIX)[0];
+        return paymentPlaceRepo.findPaymentPlaceByName(paymentPlaceName);
     }
 }
