@@ -65,6 +65,23 @@
         android:layout_alignTop="@+id/suggested_category_header_text_view"
         android:text="@string/payment_place_default_name" />
 
+    <TextView
+        android:id="@+id/account_header_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/suggested_category_header_text_view"
+        android:text="@string/account_header" />
+
+    <TextView
+        android:id="@+id/account_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/payment_place_text_view"
+        android:layout_alignTop="@+id/account_header_text_view"
+        android:text="@string/account_default_name" />
+
 
     <TextView
         android:id="@+id/sms_message_header_text_view"
@@ -72,7 +89,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/suggested_category_header_text_view"
+        android:layout_below="@+id/account_header_text_view"
         android:text="@string/sms_text_header" />
 
     <TextView

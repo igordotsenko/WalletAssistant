@@ -14,11 +14,14 @@ import com.kindhomeless.wa.walletassistant.repo.storage.PaymentPlaceRepo;
 public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransformer {
     private static final String PARTS_SEPARATOR = "UAH";
     private static final String WORDS_SEPARATOR = " ";
+    private static final String ACCOUNT_SEPARATOR = "/";
     private static final String UAH_PAYMENT_PREFIX = "Vasha operatsija:";
     private static final String PAYMENT_PLACE_POSTFIX = "dostupna suma";
     private static final int MIN_EXPECTED_PARTS = 2;
     private static final int PAYMENT_AMOUNT_PART_NUMBER = 0;
     private static final int PAYMENT_PLACE_PART_NUMBER = 1;
+    private static final int ACCOUNT_INFO_SUB_PART = 1;
+    private static final int ACCOUNT_INFO_WORD_INDEX = 0;
 
     private PaymentPlaceRepo paymentPlaceRepo;
 
@@ -32,7 +35,8 @@ public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransfor
             throw new TransformationException("Is not an UAH payment");
         }
         String[] parts = getParts(paymentSmsText);
-        return new PaymentSms(paymentSmsText, getAmount(parts), getPaymentPlace(parts));
+        return new PaymentSms(
+                paymentSmsText, getAmount(parts), getPaymentPlace(parts), getAccountId(parts));
     }
 
     private String[] getParts(String paymentSmsTest) throws TransformationException {
@@ -70,5 +74,13 @@ public class TextToPaymentSmsTransformerImpl implements TextToPaymentSmsTransfor
     private PaymentPlace getPaymentPlace(String[] parts) {
         String paymentPlaceName = parts[PAYMENT_PLACE_PART_NUMBER].split(PAYMENT_PLACE_POSTFIX)[0];
         return paymentPlaceRepo.findPaymentPlaceByName(paymentPlaceName);
+    }
+
+    private String getAccountId(String[] parts) {
+        String[] subParts = parts[PAYMENT_AMOUNT_PART_NUMBER].split(ACCOUNT_SEPARATOR);
+        String accountInfo = subParts[ACCOUNT_INFO_SUB_PART]
+                .split(WORDS_SEPARATOR)[ACCOUNT_INFO_WORD_INDEX];
+
+        return AccountMapper.getAccountId(accountInfo);
     }
 }

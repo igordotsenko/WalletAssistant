@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.kindhomeless.wa.walletassistant.R;
+import com.kindhomeless.wa.walletassistant.logic.transformer.AccountMapper;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformer;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformerImpl;
 import com.kindhomeless.wa.walletassistant.logic.transformer.TransformationException;
@@ -50,6 +51,7 @@ public class RecordPostActivity extends AppCompatActivity {
     private TextView paymentAmountTextView;
     private TextView paymentPlaceTextView;
     private TextView suggestedCategoryTextView;
+    private TextView accountNameTextView;
     private Spinner categoriesDropdown;
     private TextView smsMessageTextView;
     private Button postRecordButton;
@@ -88,6 +90,7 @@ public class RecordPostActivity extends AppCompatActivity {
         paymentAmountTextView = findViewById(R.id.payment_amount_text_view);
         paymentPlaceTextView = findViewById(R.id.payment_place_text_view);
         suggestedCategoryTextView = findViewById(R.id.suggested_category_text_view);
+        accountNameTextView = findViewById(R.id.account_text_view);
         categoriesDropdown = findViewById(R.id.categories_list_dropdown);
         smsMessageTextView = findViewById(R.id.sms_message_text_view);
         postRecordButton = findViewById(R.id.post_record_button);
@@ -98,6 +101,7 @@ public class RecordPostActivity extends AppCompatActivity {
         smsMessageTextView.setText(paymentSms.getText());
         postRecordButton.setOnClickListener(new PostRecordButtonListener(paymentSms));
         paymentSms.getPaymentPlace().ifPresent(this::handlePaymentPlace);
+        accountNameTextView.setText(AccountMapper.getAccountName(paymentSms.getAccountId()));
     }
 
     private void handlePaymentPlace(PaymentPlace paymentPlace) {
@@ -153,7 +157,7 @@ public class RecordPostActivity extends AppCompatActivity {
                 showToast(RecordPostActivity.this, "Category is not chosen or not known");
                 return;
             }
-            Record record = new Record(categoryId, paymentSms.getAmount());
+            Record record = new Record(categoryId, paymentSms.getAccountId(), paymentSms.getAmount());
             walletApiManager.postRecord(singletonList(record), new PostRecordCallback());
         }
     }

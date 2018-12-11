@@ -23,5 +23,7 @@
     <string name="payment_place_default_name">unknown</string>
     <string name="suggested_category_header">Suggested category:</string>
     <string name="suggested_category_default_name">unknown</string>
+    <string name="account_header">Account name:</string>
+    <string name="account_default_name">unknown</string>
 
 </resources>

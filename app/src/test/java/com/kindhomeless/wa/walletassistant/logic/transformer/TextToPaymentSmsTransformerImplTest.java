@@ -1,9 +1,6 @@
-package com.kindhomeless.wa.walletassistant.util.transformer;
+package com.kindhomeless.wa.walletassistant.logic.transformer;
 
 import com.kindhomeless.wa.walletassistant.BasicTest;
-import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformer;
-import com.kindhomeless.wa.walletassistant.logic.transformer.TextToPaymentSmsTransformerImpl;
-import com.kindhomeless.wa.walletassistant.logic.transformer.TransformationException;
 import com.kindhomeless.wa.walletassistant.model.PaymentSms;
 import com.kindhomeless.wa.walletassistant.repo.storage.PaymentPlaceRepo;
 import com.kindhomeless.wa.walletassistant.repo.storage.PaymentPlaceRepoMock;
@@ -45,6 +42,16 @@ public class TextToPaymentSmsTransformerImplTest extends BasicTest {
         String unknownPaymentSmsText = "Vasha operatsija: 24.11.2018 17:51:07 Mastercard " +
                 "Platinum/1234 8.00 UAH UNKNOWN dostupna suma 3.21 UAH";
         assertFalse(transformer.transform(unknownPaymentSmsText).getPaymentPlace().isPresent());
+    }
+
+    @Test
+    public void accountTest() throws Exception {
+        String avalSms1 = "Vasha operatsija: 03.09.2018 21:13:36 Visa Premium/3498 1.23 UAH RAIFFEISEN ONLINE UAH dostupna suma 3.21 UAH";
+        String avalSms2 = "Vasha operatsija: 03.09.2018 21:13:36 Visa Premium/3134 1.23 UAH RAIFFEISEN ONLINE UAH dostupna suma 3.21 UAH";
+        String avalCrSms = "Vasha operatsija: 03.09.2018 21:13:36 Visa Premium/2427 1.23 UAH RAIFFEISEN ONLINE UAH dostupna suma 3.21 UAH";
+        assertEquals(AccountMapper.AVAL_ID, transformer.transform(avalSms1).getAccountId());
+        assertEquals(AccountMapper.AVAL_ID, transformer.transform(avalSms2).getAccountId());
+        assertEquals(AccountMapper.AVAL_CR_ID, transformer.transform(avalCrSms).getAccountId());
     }
 
     @Test
