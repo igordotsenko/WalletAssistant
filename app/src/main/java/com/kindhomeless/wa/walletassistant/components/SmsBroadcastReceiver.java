@@ -20,6 +20,7 @@ import java.util.Set;
 
 import static com.kindhomeless.wa.walletassistant.util.Constants.APP_TAG;
 import static com.kindhomeless.wa.walletassistant.util.Constants.CHANNEL_ID;
+import static com.kindhomeless.wa.walletassistant.util.Constants.NOTIFICATION_ID_EXTRA;
 import static com.kindhomeless.wa.walletassistant.util.Constants.SMS_TEXT_EXTRA;
 import static com.kindhomeless.wa.walletassistant.util.ToastUtils.showToastAndLogError;
 
@@ -65,13 +66,14 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void sendPaymentToRecordNotification(Context context, String smsText) {
+        int notificationId = getRandomNotificationId();
         NotificationCompat.Builder notificationBuilder = prepareNotificationBuilder(context, smsText);
-        notificationBuilder.setContentIntent(buildPendingIntent(context, smsText));
+        notificationBuilder.setContentIntent(buildPendingIntent(context, smsText, notificationId));
 
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager != null) {
-            notificationManager.notify(getRandomNotificationId(), notificationBuilder.build());
+            notificationManager.notify(notificationId, notificationBuilder.build());
         } else {
             Log.d(APP_TAG, "Got notificationManager as null in SmsBroadcastReceiver");
         }
@@ -90,10 +92,11 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
      * @return pending intent which contains sms text in extras and is used for PostRecordActivity
      * creation when notification is clicked
      */
-    private PendingIntent buildPendingIntent(Context context, String smsText) {
+    private PendingIntent buildPendingIntent(Context context, String smsText, int notificationId) {
         // Put extras
         Intent resultIntent = new Intent(context, RecordPostActivity.class);
         resultIntent.putExtra(SMS_TEXT_EXTRA, smsText);
+        resultIntent.putExtra(NOTIFICATION_ID_EXTRA, notificationId);
 
         // Build stack builder
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

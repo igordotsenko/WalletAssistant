@@ -1,5 +1,7 @@
 package com.kindhomeless.wa.walletassistant.components;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +26,7 @@ import com.kindhomeless.wa.walletassistant.repo.api.WalletApiManager;
 import com.kindhomeless.wa.walletassistant.repo.api.WalletApiManagerImpl;
 import com.kindhomeless.wa.walletassistant.repo.storage.PaymentPlaceRepo;
 import com.kindhomeless.wa.walletassistant.repo.storage.RepositoryManager;
+import com.kindhomeless.wa.walletassistant.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +139,16 @@ public class RecordPostActivity extends AppCompatActivity {
         }
     }
 
+    private void closeCorrespondingNotification() {
+        NotificationManager notificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager != null) {
+            notificationManager.cancel(getIntent().getIntExtra(Constants.NOTIFICATION_ID_EXTRA, -1));
+        } else {
+            Log.d(APP_TAG, "Cannot close notification as notification manager is null");
+        }
+    }
+
     private class PostRecordButtonListener implements View.OnClickListener {
         private final PaymentSms paymentSms;
 
@@ -228,6 +241,8 @@ public class RecordPostActivity extends AppCompatActivity {
                     "Record was sent successfully" :
                     "Post is not successful: " + response.code() + "; " + response.message();
             showToastAndLogDebug(RecordPostActivity.this, toastMsg);
+            closeCorrespondingNotification();
+            finish();
         }
 
         @Override
