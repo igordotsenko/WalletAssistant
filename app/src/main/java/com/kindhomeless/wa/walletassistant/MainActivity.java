@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startSmsListenerService() {
-        startService(new Intent(getApplicationContext(), SmsListenerService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(getApplicationContext(), SmsListenerService.class));
+        }
     }
 
     private void stopSmsListenerService() {
@@ -166,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
     private void listAllCategories() {
         walletApiManager.listAllCategories(new CategoriesListCallback());
     }
+
 
     private class ApplyCredentialsButtonListener implements View.OnClickListener {
         @Override

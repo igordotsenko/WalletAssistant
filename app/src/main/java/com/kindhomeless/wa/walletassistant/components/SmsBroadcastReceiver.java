@@ -79,7 +79,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     private NotificationCompat.Builder prepareNotificationBuilder(Context context, String smsText) {
         return new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(context.getResources().getString(R.string.app_name))
                 .setContentText(smsText)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(smsText))
